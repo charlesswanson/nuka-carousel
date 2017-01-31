@@ -10,6 +10,13 @@ A Pure ReactJS Carousel Component
 npm install nuka-carousel
 ```
 
+###Compile changes
+
+Update lib with src
+```
+gulp build
+```
+
 ###Example
 ```javascript
 'use strict';

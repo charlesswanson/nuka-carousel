@@ -166,14 +166,14 @@ const Carousel = React.createClass({
     var self = this;
     var children = React.Children.count(this.props.children) > 1 ? this.formatChildren(this.props.children) : this.props.children;
     return (
-      <div className={['slider', this.props.className || ''].join(' ')} ref="slider" style={assign(this.getSliderStyles(), this.props.style || {})}>
+      <div className={['slider', this.props.className || ''].join(' ')} style={assign(this.getSliderStyles(), this.props.style || {})}>
         <div className="slider-frame"
-          ref="frame"
+          ref={frame => {this.frame = frame}}
           style={this.getFrameStyles()}
           {...this.getTouchEvents()}
           {...this.getMouseEvents()}
           onClick={this.handleClick}>
-          <ul className="slider-list" ref="list" style={this.getListStyles()}>
+          <ul className="slider-list" style={this.getListStyles()}>
             {children}
           </ul>
         </div>
@@ -661,7 +661,7 @@ const Carousel = React.createClass({
       slideHeight;
 
     slidesToScroll = props.slidesToScroll;
-    frame = this.refs.frame;
+    frame = this.frame;
     firstSlide = frame.childNodes[0].childNodes[0];
     if (firstSlide) {
       firstSlide.style.height = 'auto';
