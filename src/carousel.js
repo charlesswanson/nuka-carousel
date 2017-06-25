@@ -146,7 +146,7 @@ const Carousel = React.createClass({
     });
     this.setDimensions(nextProps);
     if (this.props.slideIndex !== nextProps.slideIndex || nextProps.slideIndex !== this.state.currentSlide) {
-      this.goToSlide(nextProps.slideIndex);
+      this.goToSlide(nextProps.slideIndex, nextProps);
     }
     if (this.props.autoplay !== nextProps.autoplay) {
       if (nextProps.autoplay) {
@@ -195,7 +195,7 @@ const Carousel = React.createClass({
                   wrapAround={self.props.wrapAround}
                   nextSlide={self.nextSlide}
                   previousSlide={self.previousSlide}
-                  goToSlide={self.goToSlide} />
+                  goToSlide={self.goToSlide, self.props} />
               </div>
             )
           })
@@ -464,31 +464,32 @@ const Carousel = React.createClass({
 
   // Action Methods
 
-  goToSlide(index) {
+  goToSlide(index, props=this.props) {
     var self = this;
-    if ((index >= React.Children.count(this.props.children) || index < 0)) {
-      if (!this.props.wrapAround) { return };
-      if (index >= React.Children.count(this.props.children)) {
-        this.props.beforeSlide(this.state.currentSlide, 0);
+    var selfProps = props;
+    if ((index >= React.Children.count(props.children) || index < 0)) {
+      if (!props.wrapAround) { return };
+      if (index >= React.Children.count(props.children)) {
+        props.beforeSlide(this.state.currentSlide, 0);
         return this.setState({
           currentSlide: 0
         }, function() {
           self.animateSlide(null, null, self.getTargetLeft(null, index), function() {
             self.animateSlide(null, 0.01);
-            self.props.afterSlide(0);
+            selfProps.afterSlide(0);
             self.resetAutoplay();
             self.setExternalData();
           });
         });
       } else {
-        var endSlide = React.Children.count(this.props.children) - this.state.slidesToScroll;
-        this.props.beforeSlide(this.state.currentSlide, endSlide);
+        var endSlide = React.Children.count(props.children) - this.state.slidesToScroll;
+        props.beforeSlide(this.state.currentSlide, endSlide);
         return this.setState({
           currentSlide: endSlide
         }, function() {
           self.animateSlide(null, null, self.getTargetLeft(null, index), function() {
             self.animateSlide(null, 0.01);
-            self.props.afterSlide(endSlide);
+            selfProps.afterSlide(endSlide);
             self.resetAutoplay();
             self.setExternalData();
           });
@@ -496,7 +497,7 @@ const Carousel = React.createClass({
       }
     }
 
-    this.props.beforeSlide(this.state.currentSlide, index);
+    props.beforeSlide(this.state.currentSlide, index);
     const previousIndex = this.state.currentSlide;
 
     this.setState({
@@ -505,7 +506,7 @@ const Carousel = React.createClass({
       self.animateSlide(null, null, null, function() {
         self.animateSlide(null, 0.01);
         if (previousIndex !== index) {
-          self.props.afterSlide(index);
+          selfProps.afterSlide(index);
         }
         self.resetAutoplay();
         self.setExternalData();
