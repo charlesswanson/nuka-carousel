@@ -146,7 +146,7 @@ const Carousel = React.createClass({
     });
     this.setDimensions(nextProps);
     if (this.props.slideIndex !== nextProps.slideIndex || nextProps.slideIndex !== this.state.currentSlide) {
-      this.goToSlide(nextProps.slideIndex, nextProps);
+      this.goToSlide(nextProps.slideIndex, false, nextProps);
     }
     if (this.props.autoplay !== nextProps.autoplay) {
       if (nextProps.autoplay) {
@@ -195,7 +195,7 @@ const Carousel = React.createClass({
                   wrapAround={self.props.wrapAround}
                   nextSlide={self.nextSlide}
                   previousSlide={self.previousSlide}
-                  goToSlide={self.goToSlide, self.props} />
+                  goToSlide={self.goToSlide} />
               </div>
             )
           })
@@ -384,17 +384,17 @@ const Carousel = React.createClass({
         ) {
           this.animateSlide(tweenState.easingTypes[this.props.edgeEasing]);
         } else {
-          this.nextSlide();
+          this.nextSlide(true);
         }
       } else if (this.touchObject.direction === -1) {
         if (this.state.currentSlide <= 0 && !this.props.wrapAround) {
           this.animateSlide(tweenState.easingTypes[this.props.edgeEasing]);
         } else {
-          this.previousSlide();
+          this.previousSlide(true);
         }
       }
     } else {
-      this.goToSlide(this.state.currentSlide);
+      this.goToSlide(this.state.currentSlide, true);
     }
 
     this.touchObject = {};
@@ -464,7 +464,7 @@ const Carousel = React.createClass({
 
   // Action Methods
 
-  goToSlide(index, props=this.props) {
+  goToSlide(index, isSwipe, props=this.props) {
     var self = this;
     var selfProps = props;
     if ((index >= React.Children.count(props.children) || index < 0)) {
@@ -476,7 +476,7 @@ const Carousel = React.createClass({
         }, function() {
           self.animateSlide(null, null, self.getTargetLeft(null, index), function() {
             self.animateSlide(null, 0.01);
-            selfProps.afterSlide(0);
+            selfProps.afterSlide(0, isSwipe);
             self.resetAutoplay();
             self.setExternalData();
           });
@@ -489,7 +489,7 @@ const Carousel = React.createClass({
         }, function() {
           self.animateSlide(null, null, self.getTargetLeft(null, index), function() {
             self.animateSlide(null, 0.01);
-            selfProps.afterSlide(endSlide);
+            selfProps.afterSlide(endSlide, isSwipe);
             self.resetAutoplay();
             self.setExternalData();
           });
@@ -506,7 +506,7 @@ const Carousel = React.createClass({
       self.animateSlide(null, null, null, function() {
         self.animateSlide(null, 0.01);
         if (previousIndex !== index) {
-          selfProps.afterSlide(index);
+          selfProps.afterSlide(index, isSwipe);
         }
         self.resetAutoplay();
         self.setExternalData();
@@ -515,7 +515,7 @@ const Carousel = React.createClass({
 
   },
 
-  nextSlide() {
+  nextSlide(isSwipe=false) {
     var childrenCount = React.Children.count(this.props.children);
     var slidesToShow = this.props.slidesToShow;
     if (this.props.slidesToScroll === 'auto') {
@@ -526,26 +526,27 @@ const Carousel = React.createClass({
     }
 
     if (this.props.wrapAround) {
-      this.goToSlide(this.state.currentSlide + this.state.slidesToScroll);
+      this.goToSlide(this.state.currentSlide + this.state.slidesToScroll, isSwipe);
     } else {
       if (this.props.slideWidth !== 1) {
-        return this.goToSlide(this.state.currentSlide + this.state.slidesToScroll);
+        return this.goToSlide(this.state.currentSlide + this.state.slidesToScroll, isSwipe);
       }
       this.goToSlide(
-        Math.min(this.state.currentSlide + this.state.slidesToScroll, childrenCount - slidesToShow)
+        Math.min(this.state.currentSlide + this.state.slidesToScroll, childrenCount - slidesToShow),
+        isSwipe
       );
     }
   },
 
-  previousSlide() {
+  previousSlide(isSwipe=false) {
     if (this.state.currentSlide <= 0 && !this.props.wrapAround) {
       return;
     }
 
     if (this.props.wrapAround) {
-      this.goToSlide(this.state.currentSlide - this.state.slidesToScroll);
+      this.goToSlide(this.state.currentSlide - this.state.slidesToScroll, isSwipe);
     } else {
-      this.goToSlide(Math.max(0, this.state.currentSlide - this.state.slidesToScroll));
+      this.goToSlide(Math.max(0, this.state.currentSlide - this.state.slidesToScroll), isSwipe);
     }
   },
 

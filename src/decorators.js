@@ -70,7 +70,7 @@ const DefaultDecorators = [
                   <li style={self.getListItemStyles()} key={index}>
                     <button
                       style={self.getButtonStyles(self.props.currentSlide === index)}
-                      onClick={self.props.goToSlide.bind(null, index)}>
+                      onClick={self.props.goToSlide.bind(null, index, false)}>
                       &bull;
                     </button>
                   </li>
